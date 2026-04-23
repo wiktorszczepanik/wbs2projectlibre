@@ -1,14 +1,18 @@
 import sys
-import xml.etree.ElementTree as ET
 import shutil
 from datetime import date, datetime
+import xml.etree.ElementTree as ET
+
 
 TASK = "resources/task.xml"
 TEMPLATE = "resources/template.xml"
+NS = "http://schemas.microsoft.com/project"
 
 
 def insert_xml_metadata(output_path, day, time):
     meta_tags = {
+        'Name': 'Template',
+        'Title': 'Template',
         'StartDate': f"{day}T08:00:00",
         'FinishDate': f"{day}T17:00:00",
         'CurrentDate': time
@@ -17,11 +21,8 @@ def insert_xml_metadata(output_path, day, time):
     root = tree.getroot()
     for tag, value in meta_tags.items():
         element = root.find(f".//{{*}}{tag}")
-        if element is None:
-            element = ET.SubElement(root, f"{{http://schemas.microsoft.com/project}}{tag}")
         element.text = str(value)
 
-    NS = "http://schemas.microsoft.com/project"
     ET.register_namespace("", NS)
     tree.write(output_path, encoding="utf-8", xml_declaration=True)
 
@@ -101,7 +102,7 @@ def wbs_to_xml_tasks(lines, day, time):
 def wbs_to_xml_assignments(lines, day, time):
     assignment = []
     uid = 1
-    for line in lines:
+    for _ in lines:
         task_element = ET.Element("Assignment")
         data = {
             'UID': uid,
@@ -121,6 +122,7 @@ def wbs_to_xml_assignments(lines, day, time):
         for tag, value in data.items():
             child = ET.SubElement(task_element, tag)
             child.text = str(value)
+
         timephased_data = {
             'Type': 1,
             'UID': uid,
@@ -144,8 +146,10 @@ def insert_xml_tasks(tasks, output_path):
     tree = ET.parse(output_path)
     root = tree.getroot()
     tasks_node = root.find(".//{*}Tasks")
+
     if tasks_node is None:
         tasks_node = ET.SubElement(root, "Tasks")
+
     for task in tasks:
         if isinstance(task, str):
             task = ET.fromstring(task)
@@ -159,8 +163,10 @@ def insert_xml_assignments(tasks, output_path):
     tree = ET.parse(output_path)
     root = tree.getroot()
     assignments_node = root.find(".//{*}Assignments")
+
     if assignments_node is None:
         assignments_node = ET.SubElement(root, "Assignments")
+
     for task in tasks:
         assignments_node.append(task)
 
@@ -171,7 +177,7 @@ def insert_xml_assignments(tasks, output_path):
 if __name__ == '__main__':
     wbs, project_file = sys.argv[1:3]
     day = date.today().isoformat()
-    time = datetime.now().isoformat()
+    time = datetime.now().isoformat(timespec="seconds")
 
     shutil.copyfile(TEMPLATE, project_file)
     insert_xml_metadata(project_file, day, time)
