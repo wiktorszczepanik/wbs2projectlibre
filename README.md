@@ -12,6 +12,8 @@ The input file should be a plain text, for example:
 
 ### Usage
 
+The first argument (*wbs.txt*) is the **input** file, and the second argument (*project.xml*) is the **output** file.
+
 ```bash
 $ python3 script.py wbs.txt project.xml
 ```
