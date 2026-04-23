@@ -1,6 +1,10 @@
 .venv
 .venv/
+.venv/*
 .idea
 .idea/
+.idea/*
 test_files
 test_files/
+test_files/*
+project.xml
