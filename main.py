@@ -1,6 +1,6 @@
 import sys
-import shutil
 from datetime import date, datetime
+import shutil
 import xml.etree.ElementTree as ET
 
 
