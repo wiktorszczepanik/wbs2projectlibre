@@ -1,10 +1,12 @@
 import sys
+import re
 from datetime import date, datetime
 import shutil
 import xml.etree.ElementTree as ET
 
 
 TASK = "resources/task.xml"
+ASSIGNMENT = "resources/assignment.xml"
 TEMPLATE = "resources/template.xml"
 NS = "http://schemas.microsoft.com/project"
 
@@ -30,10 +32,13 @@ def insert_xml_metadata(output_path, day, time):
 def parse_wbs_file(wbs_path):
     lines = []
     with open(wbs_path, 'r', encoding='utf8') as file:
-        for line in file:
-            line = line.strip()
-            if line != "":
-                lines.append(line)
+        for raw in file:
+            # Unicode cleanup
+            text = re.sub(r'[\u000B\u000C\u0085\u2028\u2029]', '\n', raw)
+            for line in text.split("\n"):
+                line = line.strip()
+                if line != "":
+                    lines.append(line)
     return lines
 
 
